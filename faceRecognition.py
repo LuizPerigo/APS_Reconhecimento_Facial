@@ -76,3 +76,4 @@ def openFaceRecognition():
     video_capture.release()
     cv2.destroyAllWindows()
     print(f"Autenticar como {fiveMatches['nameFiveMatches']}")
+    return fiveMatches['nameFiveMatches']

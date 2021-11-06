@@ -37,7 +37,7 @@ def selectUsuario(usuario):
                                 FROM USUARIOS u
                                 LEFT JOIN CARGOS_USUARIOS ca ON ca.id_usuario = u.id
                                 LEFT JOIN CARGOS c ON c.id = ca.id_cargo
-                                WHERE usuario = "{usuario}"''')
+                                WHERE usuario = "{usuario}"''').fetchone()
 
 def autenticaUsuario(usuario, senha):
     conn = createConnection()
