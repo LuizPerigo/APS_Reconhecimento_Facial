@@ -29,11 +29,14 @@ if __name__ == '__main__':
             print("Autenticou como admin")
         else:
             usuario_fr = faceRecognition.openFaceRecognition()
-            if(usuario_fr == usuario):
-                dados_usuario = DBConnection.selectUsuario(usuario)
-                print(f"Bem vindo {dados_usuario[4]} {dados_usuario[2]}, nível de acesso {dados_usuario[5]}")
+            if usuario_fr == "TIMEOUT":
+                print("Tempo para autenticação facial esgotado")
             else:
-                print("Reconhecimento facial falhou, a face reconhecida não pertence ao usuário utilizado")
+                if(usuario_fr == usuario):
+                    dados_usuario = DBConnection.selectUsuario(usuario)
+                    print(f"Bem vindo {dados_usuario[4]} {dados_usuario[2]}, nível de acesso {dados_usuario[5]}")
+                else:
+                    print("Reconhecimento facial falhou, a face reconhecida não pertence ao usuário utilizado")
             
     elif acao == 0:
         exit()

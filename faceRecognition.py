@@ -19,8 +19,16 @@ def openFaceRecognition():
     counts = {}
     #armazenar quando houver mais de 5 matches em uma pessoa, para entao dar sequencia na autenticacao
     fiveMatches = {'hasFiveMatches': False, 'nameFiveMatches': ''}
+    #variaveis para dar timeout
+    tempo_inicio = time.time()
+    timeout = False
     #loop para procurar um match
     while True:
+        #controle de tempo, apos 60 segundos sem reconhecer uma face, interrompe o reconhecimento facial
+        tempo_decorrido = time.time() - tempo_inicio
+        if(tempo_decorrido >= 60):
+            timeout = True
+            break
         #ler conteudo do video
         ret, frame = video_capture.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -75,5 +83,7 @@ def openFaceRecognition():
             break
     video_capture.release()
     cv2.destroyAllWindows()
-    print(f"Autenticar como {fiveMatches['nameFiveMatches']}")
-    return fiveMatches['nameFiveMatches']
+    if timeout:
+        return "TIMEOUT"
+    else:
+        return fiveMatches['nameFiveMatches']
