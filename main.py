@@ -39,6 +39,8 @@ def login():
                 retry = input("Deseja tentar novamente?(s/n): ")
                 if retry == "n" or retry == "N" or retry == "s" or retry == "S":
                     break
+                else:
+                    print("Opção inválida")
             if retry == "n" or retry == "N":
                 menuInicial()
                 return
@@ -95,8 +97,10 @@ def openMenuAutenticado(dados_usuario):
                 menu_escolhido = int(menu_escolhido)
                 if menu_escolhido <= len(menu) and menu_escolhido > 0:
                     break
+                else:
+                    print("Opção inválida")
             except:
-                None
+                print("Opção inválida")
         #Se nao possui menu, exibe mensagem e para programa
         else:
             print("Seu nível de acesso não possui nenhuma funcionalidade do sistema liberada, contate um administrador")
