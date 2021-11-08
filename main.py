@@ -1,3 +1,4 @@
+from sqlite3 import dbapi2
 import loadFaces
 import faceRecognition
 import DBConnection
@@ -71,15 +72,70 @@ def login():
         dados_usuario = DBConnection.selectUsuario(usuario)
         openMenuAutenticado(dados_usuario)
 
+#Lista os menus que o usuario tem acesso
 def openMenuAutenticado(dados_usuario):
     print(f"Bem vindo {dados_usuario[4]} {dados_usuario[2]}, nível de acesso {dados_usuario[5]}")
-    menu = getMenuUsuario(dados_usuario[1], dados_usuario[5])
-    print(menu)
 
-#Retorna o menu que o usuario tem acesso apos login
-def getMenuUsuario(usuario, nvl_acesso):
-    menu = ["menu"]
-    return menu
+    #Busca os menus que o usuario tem acesso
+    menu = DBConnection.getMenuUsuario(dados_usuario[5])
+
+    #Fica em loop ate escolher um menu valido
+    while True:
+        #Se possui ao menos um menu exibe
+        if len(menu) > 0:
+            print("O que deseja fazer?")
+
+            #percorre os menus para listar
+            for idx in range(len(menu)):
+                print(f"{idx+1} - {menu[idx][1]}")
+            menu_escolhido = input()
+            #tenta converter para inteiro o valor recebido (assim programa nao para em caso de letras e simbolos),
+            #pois o valor inteiro é comparado para saber se existe menu correspondente, assim parando o loop
+            try:
+                menu_escolhido = int(menu_escolhido)
+                if menu_escolhido <= len(menu) and menu_escolhido > 0:
+                    break
+            except:
+                None
+        #Se nao possui menu, exibe mensagem e para programa
+        else:
+            print("Seu nível de acesso não possui nenhuma funcionalidade do sistema liberada, contate um administrador")
+            return
+
+    #Se chegou aqui, o usuario possui acesso a menus, neste caso ira seguir para a opção escolhida
+    if menu[menu_escolhido-1][0] == "inserir_usuario":
+        menuInserirUsuario()
+    elif menu[menu_escolhido-1][0] == "excluir_usuario":
+        menuExcluirUsuario()
+
+#Inserir usuario
+def menuInserirUsuario():
+    print("I")
+
+#Excluir usuario
+def menuExcluirUsuario():
+    #Busca todos os usuarios do sistema
+    lista_usuarios = DBConnection.selectUsuarios()
+    #Loop até escolher um usuario valido
+    while True:
+        print("Usuários cadastrados no sistema:")
+        #Lista os usuarios
+        for idx in range(len(lista_usuarios)):
+            print(f"{idx+1} - {lista_usuarios[idx][4]} {lista_usuarios[idx][2]}")
+        idx_usuario_excluir = input("Qual dos usuários acima deseja excluir?\n")
+        #Tenta converter o valor recebido para inteiro (evita erro em caso de letras e simbolos)
+        try:
+            idx_usuario_excluir = int(idx_usuario_excluir)
+            #Se for um valor correspondente a um usuario, para o loop
+            if idx_usuario_excluir <= len(lista_usuarios) and idx_usuario_excluir > 0:
+                break
+        except:
+            None
+    #Manda excluir o usuario e exibe mensagem de acordo com o resultado
+    if DBConnection.excluirUsuario(lista_usuarios[idx_usuario_excluir-1][0]):
+        print("Usuário excluído com sucesso")
+    else:
+        print("Falha ao excluir usuário")
 
 #Para a aplicacao
 def fechaSistema():

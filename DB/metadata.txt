@@ -1,6 +1,6 @@
 CREATE TABLE "usuarios" (
 	"id"	INTEGER NOT NULL,
-	"usuario"	TEXT NOT NULL,
+	"usuario"	TEXT NOT NULL UNIQUE,
 	"senha"	TEXT,
 	"nome"	TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
@@ -9,7 +9,7 @@ CREATE TABLE "usuarios" (
 CREATE TABLE "cargos" (
 	"id"	INTEGER NOT NULL,
 	"nome"	TEXT NOT NULL,
-	"nvl_acesso"	INTEGER CHECK("nvl_acesso" IN (1,2,3)) NOT NULL DEFAULT 1,
+	"nvl_acesso"	INTEGER CHECK("nvl_acesso" IN (1, 2, 3, 4)) NOT NULL DEFAULT 1,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 
@@ -19,5 +19,13 @@ CREATE TABLE "cargos_usuarios" (
 	"id_cargo"	INTEGER NOT NULL,
 	FOREIGN KEY("id_usuario") REFERENCES "usuarios"("id") ON DELETE CASCADE,
 	FOREIGN KEY("id_cargo") REFERENCES "cargos"("id") ON DELETE CASCADE,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+
+CREATE TABLE "menu" (
+	"id"	INTEGER NOT NULL,
+	"codigo"	TEXT NOT NULL UNIQUE,
+	"nome"	TEXT NOT NULL,
+	"nvs_acesso_permitidos"	TEXT NOT NULL DEFAULT '1,2,3,4',
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
