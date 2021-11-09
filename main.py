@@ -211,7 +211,7 @@ def menuExcluirUsuario():
         except:
             print("Opção inválida")
     #Manda excluir o usuario e exibe mensagem de acordo com o resultado
-    if DBConnection.excluirUsuario(lista_usuarios[idx_usuario_excluir-1][0]):
+    if DBConnection.excluirUsuario(lista_usuarios[idx_usuario_excluir-1][0], lista_usuarios[idx_usuario_excluir-1][1]):
         print("Usuário excluído com sucesso")
     else:
         print("Falha ao excluir usuário")

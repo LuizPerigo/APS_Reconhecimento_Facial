@@ -24,3 +24,6 @@ def openImageSelector():
                                                     ('Todos os arquivos', '.*')
                                                 ])
     return image_path
+
+def deleteUserDir(usuario):
+    shutil.rmtree(f"Images/{usuario}")

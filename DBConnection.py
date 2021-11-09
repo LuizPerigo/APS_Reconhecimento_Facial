@@ -85,12 +85,13 @@ def inserirUsuario(novo_usuario):
         return False
 
 #Exclui usuario
-def excluirUsuario(id_usuario):
+def excluirUsuario(id_usuario, usuario):
     try:
         conn = createConnection()
         cur = conn.cursor()
         cur.execute("PRAGMA foreign_keys=ON") #é necessário para o ON DELETE CASCADE funcionar (vem como off por padrão no sqlite)
         cur.execute(f'DELETE FROM USUARIOS WHERE id = {id_usuario}')
+        fileControl.deleteUserDir(usuario)
         conn.commit()
         return True
     except:
