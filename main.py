@@ -3,6 +3,8 @@ import loadFaces
 import faceRecognition
 import DBConnection
 import getpass
+import fileControl
+import re
 
 #Carrega o menu inicial
 def menuInicial():
@@ -89,12 +91,13 @@ def openMenuAutenticado():
             #percorre os menus para listar
             for idx in range(len(menu)):
                 print(f"{idx+1} - {menu[idx][1]}")
+            print("0 - Sair")
             menu_escolhido = input()
             #tenta converter para inteiro o valor recebido (assim programa nao para em caso de letras e simbolos),
             #pois o valor inteiro é comparado para saber se existe menu correspondente, assim parando o loop
             try:
                 menu_escolhido = int(menu_escolhido)
-                if menu_escolhido <= len(menu) and menu_escolhido > 0:
+                if menu_escolhido <= len(menu) and menu_escolhido >= 0:
                     break
                 else:
                     print("Opção inválida")
@@ -105,6 +108,10 @@ def openMenuAutenticado():
             input("Seu nível de acesso não possui nenhuma funcionalidade do sistema liberada, contate um administrador.\nPressione qualquer tecla para finalizar a aplicação")
             return
 
+    #Se escolheu 0, fecha sistema
+    if menu_escolhido == 0:
+        fechaSistema()
+
     #Se chegou aqui, o usuario possui acesso a menus, neste caso ira seguir para a opção escolhida
     if menu[menu_escolhido-1][0] == "inserir_usuario":
         menuInserirUsuario()
@@ -113,7 +120,74 @@ def openMenuAutenticado():
 
 #Inserir usuario
 def menuInserirUsuario():
-    print("I")
+    novo_usuario = {"nome": None, "usuario": None, "senha": None, "cargo": None, "imagePath": None}
+    #Loop ate digitar nome valido
+    while True:
+        novo_usuario["nome"] = input("Nome: ")
+        #Se for nome valido, para loop
+        if validaCampoUsuario(novo_usuario["nome"], "nome"):
+            break
+        else:
+            print("Nome inválido, deve conter ao menos 3 caracteres")
+    #Loop ate digitar usuario valido
+    while True:
+        novo_usuario["usuario"] = input("Usuário: ")
+        #Se for usuario valido, para loop
+        if validaCampoUsuario(novo_usuario["usuario"], "usuario"):
+            break
+        else:
+            print("Usuário inválido, deve conter de 5 a 20 caracteres e somente letras, números e underline (_)")
+    #Loop ate digitar senha valida
+    while True:
+        novo_usuario["senha"] = getpass.getpass("Senha: ")
+        #Se for senha valida, para loop
+        if validaCampoUsuario(novo_usuario["senha"], "senha"):
+            novo_usuario["senha"] = DBConnection.encodeBase64(novo_usuario["senha"])
+            break
+        else:
+            print("Senha inválida, deve conter ao menos 8 caracteres")
+    
+    #Busca cargos do sistema
+    lista_cargos = DBConnection.selectCargos()
+    #Loop até escolher um cargo valido
+    while True:
+        print("Cargos:")
+        #Lista os cargos
+        for idx in range(len(lista_cargos)):
+            print(f"{idx+1} - {lista_cargos[idx][1]}")
+        cargo_escolhido = input("Qual será o cargo do usuário?\n")
+        #Tenta converter o valor recebido para inteiro (evita erro em caso de letras e simbolos)
+        try:
+            cargo_escolhido = int(cargo_escolhido)
+            #Se for um valor correspondente a um cargo, para o loop
+            if cargo_escolhido <= len(lista_cargos) and cargo_escolhido > 0:
+                novo_usuario["cargo"] = lista_cargos[cargo_escolhido-1][0] #pegar id do cargo
+                break
+            else:
+                print("Opção inválida")
+        except:
+            print("Opção inválida")
+
+    #Loop até selecionar uma imagem valida
+    while True:
+        print("Selecione uma foto para o reconhecimento facial (que tenha somente você e com o rosto visível)")
+        #Abre file explorer
+        novo_usuario["imagePath"] = fileControl.openImageSelector()
+        #Valida faces reconhecidas na imagem
+        numero_faces = loadFaces.detectFacesFromImage(novo_usuario["imagePath"])
+        if numero_faces == 1:
+            break
+        elif numero_faces > 1:
+            print("Foi detectada mais de uma face na imagem selecionada")
+        else:
+            print("Nenhuma face foi reconhecida")
+
+    #Se chegou aqui, as entradas acima foram validas e tenta inserir o usuario
+    if DBConnection.inserirUsuario(novo_usuario):
+        print("Usuário inserido com sucesso.")
+    else:
+        print("Falha ao inserir usuário.")
+    openMenuAutenticado()
 
 #Excluir usuario
 def menuExcluirUsuario():
@@ -132,13 +206,29 @@ def menuExcluirUsuario():
             #Se for um valor correspondente a um usuario, para o loop
             if idx_usuario_excluir <= len(lista_usuarios) and idx_usuario_excluir > 0:
                 break
+            else:
+                print("Opção inválida")
         except:
-            None
+            print("Opção inválida")
     #Manda excluir o usuario e exibe mensagem de acordo com o resultado
     if DBConnection.excluirUsuario(lista_usuarios[idx_usuario_excluir-1][0]):
         print("Usuário excluído com sucesso")
     else:
         print("Falha ao excluir usuário")
+    openMenuAutenticado()
+
+#Valida se campo é valido
+def validaCampoUsuario(valor, campo):
+    #minimo de 3 caracteres para nome
+    if campo == "nome":
+        return len(valor) > 2
+    #5 a 20 caracteres, sendo eles letras, numeros e undeline para usuario, alem de que nao pode existir alguem com o mesmo usuario
+    elif campo == "usuario":  
+        pattern = re.compile("^[A-Za-z0-9_]{5,20}$")
+        return bool(pattern.match(valor)) and not DBConnection.verificaUsuarioExiste(valor)
+    #minimo de 8 caracteres para senha
+    elif campo == "senha":
+        return len(valor) > 7
 
 #Para a aplicacao
 def fechaSistema():

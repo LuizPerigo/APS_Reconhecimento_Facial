@@ -1,6 +1,9 @@
+from pickle import load
 import sqlite3
 from sqlite3 import Error
 import base64
+import fileControl
+import loadFaces
 
 #Cria conexao com o banco de dados
 def createConnection():
@@ -52,6 +55,13 @@ def autenticaUsuario(usuario, senha):
     cur.execute(f'''SELECT COUNT(id) FROM USUARIOS WHERE usuario = "{usuario}" AND senha="{encodeBase64(senha)}"''')
     return cur.fetchone()[0] > 0
 
+#Verifica se usuario ja existe
+def verificaUsuarioExiste(usuario):
+    conn = createConnection()
+    cur = conn.cursor()
+    cur.execute(f'''SELECT COUNT(id) FROM USUARIOS WHERE usuario = "{usuario}"''')
+    return cur.fetchone()[0] > 0
+
 #Retorna o menu que o usuario tem acesso
 def getMenuUsuario(nvl_acesso):
     conn = createConnection()
@@ -61,8 +71,18 @@ def getMenuUsuario(nvl_acesso):
                                 WHERE nvs_acesso_permitidos LIKE "%{nvl_acesso}%"''').fetchall()
 
 #Insere usuario
-def inserirUsuario():
-    print("inserir")
+def inserirUsuario(novo_usuario):
+    try:
+        conn = createConnection()
+        cur = conn.cursor()
+        cur.execute(f'INSERT INTO USUARIOS(usuario, senha, nome) VALUES ("{novo_usuario["usuario"]}", "{novo_usuario["senha"]}", "{novo_usuario["nome"]}")')
+        cur.execute(f'INSERT INTO CARGOS_USUARIOS(id_usuario, id_cargo) VALUES ({cur.lastrowid}, {novo_usuario["cargo"]})')
+        fileControl.createUserDir(novo_usuario["usuario"], novo_usuario["imagePath"])
+        loadFaces.loadFacesFromDir()
+        conn.commit()
+        return True
+    except:
+        return False
 
 #Exclui usuario
 def excluirUsuario(id_usuario):
