@@ -6,7 +6,6 @@ import getpass
 
 #Carrega o menu inicial
 def menuInicial():
-    print("Bem-vindo ao sistema do Ministério do Meio Ambiente")
     print("O que deseja fazer?")
     #Fica na pergunta ate que seja digitado um valor aceito
     while True:
@@ -71,13 +70,13 @@ def login():
     #Se chegou aqui, teve sucesso em toda a autenticacao
     if(autenticacao_completa):
         #Abre as opcoes que o usuario tem no sistema, de acordo com nivel de acesso
+        global dados_usuario #define a variavel global, pois sera usada diversas vezes em instancias diferentes da funcao openMenuAutenticado()
         dados_usuario = DBConnection.selectUsuario(usuario)
-        openMenuAutenticado(dados_usuario)
+        print(f"Bem vindo {dados_usuario[4]} {dados_usuario[2]}, nível de acesso {dados_usuario[5]}")
+        openMenuAutenticado()
 
 #Lista os menus que o usuario tem acesso
-def openMenuAutenticado(dados_usuario):
-    print(f"Bem vindo {dados_usuario[4]} {dados_usuario[2]}, nível de acesso {dados_usuario[5]}")
-
+def openMenuAutenticado():
     #Busca os menus que o usuario tem acesso
     menu = DBConnection.getMenuUsuario(dados_usuario[5])
 
@@ -103,7 +102,7 @@ def openMenuAutenticado(dados_usuario):
                 print("Opção inválida")
         #Se nao possui menu, exibe mensagem e para programa
         else:
-            print("Seu nível de acesso não possui nenhuma funcionalidade do sistema liberada, contate um administrador")
+            input("Seu nível de acesso não possui nenhuma funcionalidade do sistema liberada, contate um administrador.\nPressione qualquer tecla para finalizar a aplicação")
             return
 
     #Se chegou aqui, o usuario possui acesso a menus, neste caso ira seguir para a opção escolhida
@@ -146,4 +145,5 @@ def fechaSistema():
     exit()
 
 if __name__ == '__main__':
+    print("Bem-vindo ao sistema do Ministério do Meio Ambiente")
     menuInicial()

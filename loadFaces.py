@@ -4,14 +4,15 @@ import pickle
 import cv2
 import os
 
+#Carrega faces do diretorios de imagens para gerar arquivo com os encodings
 def loadFacesFromDir():
-    #pega o caminho dos arquivos na pasta Images(cada pessoa cadastrada deve ter um pasta aqui dentro com name_idUser[sera usado na autenticacao])
+    #pega o caminho dos arquivos na pasta Images(cada pessoa cadastrada deve ter um pasta aqui dentro com seu usuario[sera usado na autenticacao])
     imagePaths = list(paths.list_images('Images'))
     knownEncodings = []
     knownNames = []
     #percorre as imagens
     for (i, imagePath) in enumerate(imagePaths):
-        #extrai o name_idUser do caminho da imagem
+        #extrai o usuario do caminho da imagem
         name = imagePath.split(os.path.sep)[-2]
         # carrega imagem e converte de BGR para RGB
         image = cv2.imread(imagePath)
@@ -24,9 +25,28 @@ def loadFacesFromDir():
         for encoding in encodings:
             knownEncodings.append(encoding)
             knownNames.append(name)
-    #salva os encodings com o name_idUser
+    #salva os encodings com o usuario
     data = {"encodings": knownEncodings, "names": knownNames}
     #salva os encodings em um arquivo, que sera usado na comparacao com video
     f = open("face_enc", "wb")
     f.write(pickle.dumps(data))
     f.close()
+
+#Detecta se imagem possui faces e retorna a quantidade
+def detectFacesFromImage(imagePath):
+    #Cria arquivo haar
+    cascPath = os.path.dirname(cv2.__file__) + "/data/haarcascade_frontalface_alt2.xml"
+    faceCascade = cv2.CascadeClassifier(cascPath)
+    #Le a imagem e transforma ela em cinza
+    image = cv2.imread(imagePath)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    #Detecta faces na imagem cinza
+    faces = faceCascade.detectMultiScale(
+        gray,
+        scaleFactor=1.1,
+        minNeighbors=5,
+        minSize=(30, 30),
+        flags = cv2.CASCADE_SCALE_IMAGE
+    )
+    #Retorna quantidade de faces detectadas
+    return len(faces)
