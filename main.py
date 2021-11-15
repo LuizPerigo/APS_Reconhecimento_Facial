@@ -225,7 +225,7 @@ def validaCampoUsuario(valor, campo):
     #5 a 20 caracteres, sendo eles letras, numeros e undeline para usuario, alem de que nao pode existir alguem com o mesmo usuario
     elif campo == "usuario":  
         pattern = re.compile("^[A-Za-z0-9_]{5,20}$")
-        return bool(pattern.match(valor)) and not DBConnection.verificaUsuarioExiste(valor)
+        return bool(pattern.match(valor)) and not DBConnection.verificaUsuarioExiste(valor) and valor != "TIMEOUT" and valor != "Desconhecido"
     #minimo de 8 caracteres para senha
     elif campo == "senha":
         return len(valor) > 7
