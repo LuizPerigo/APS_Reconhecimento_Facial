@@ -105,7 +105,7 @@ def openMenuAutenticado():
                 print("Opção inválida")
         #Se nao possui menu, exibe mensagem e para programa
         else:
-            input("Seu nível de acesso não possui nenhuma funcionalidade do sistema liberada, contate um administrador.\nPressione qualquer tecla para finalizar a aplicação")
+            input("Seu nível de acesso não possui nenhuma funcionalidade do sistema liberada, contate um administrador.\nPressione enter para finalizar a aplicação")
             return
 
     #Se escolheu 0, fecha sistema
@@ -222,7 +222,7 @@ def validaCampoUsuario(valor, campo):
     #minimo de 3 caracteres para nome
     if campo == "nome":
         return len(valor) > 2
-    #5 a 20 caracteres, sendo eles letras, numeros e undeline para usuario, alem de que nao pode existir alguem com o mesmo usuario
+    #5 a 20 caracteres, sendo eles letras, numeros e underline para usuario, alem de que nao pode existir alguem com o mesmo usuario
     elif campo == "usuario":  
         pattern = re.compile("^[A-Za-z0-9_]{5,20}$")
         return bool(pattern.match(valor)) and not DBConnection.verificaUsuarioExiste(valor) and valor != "TIMEOUT" and valor != "Desconhecido"
