@@ -92,6 +92,7 @@ def excluirUsuario(id_usuario, usuario):
         cur.execute("PRAGMA foreign_keys=ON") #é necessário para o ON DELETE CASCADE funcionar (vem como off por padrão no sqlite)
         cur.execute(f'DELETE FROM USUARIOS WHERE id = {id_usuario}')
         fileControl.deleteUserDir(usuario)
+        loadFaces.loadFacesFromDir()
         conn.commit()
         return True
     except:
