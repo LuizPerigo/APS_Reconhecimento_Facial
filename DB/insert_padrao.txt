@@ -1,0 +1,7 @@
+INSERT INTO "menu" ("id", "codigo", "nome", "nvs_acesso_permitidos") VALUES ('1', 'inserir_usuario', 'Inserir usuário', '3,4');
+INSERT INTO "menu" ("id", "codigo", "nome", "nvs_acesso_permitidos") VALUES ('2', 'excluir_usuario', 'Excluir usuário', '3,4');
+
+INSERT INTO "cargos" ("id", "nome", "nvl_acesso") VALUES ('1', 'Técnico de campo', '1');
+INSERT INTO "cargos" ("id", "nome", "nvl_acesso") VALUES ('2', 'Diretor de divisão', '2');
+INSERT INTO "cargos" ("id", "nome", "nvl_acesso") VALUES ('3', 'Ministro do meio ambiente', '3');
+INSERT INTO "cargos" ("id", "nome", "nvl_acesso") VALUES ('4', 'Administrador', '4');
